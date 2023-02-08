@@ -21,6 +21,9 @@ public class User {
     @Column(name = "password")
     private String password;
 
+    @Column(name = "meal_status")
+    private String mealStatus;
+
     @OneToMany
     @JoinColumn(name="user_id")
     private List<Role> roles;
