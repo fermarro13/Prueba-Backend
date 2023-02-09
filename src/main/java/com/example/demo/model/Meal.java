@@ -4,7 +4,6 @@ import jakarta.persistence.*;
 import lombok.Data;
 
 import java.io.Serializable;
-
 @Entity
 @Data
 @Table(name = "meals")
@@ -12,7 +11,6 @@ public class Meal implements Serializable {
     private static final long serialVersionUID = 1L;
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "meal_id")
     private Long mealId;
 
@@ -20,6 +18,9 @@ public class Meal implements Serializable {
     private String name;
 
     @Column(name = "category")
+    private String category;
+
+    @Column(name = "origin")
     private String origin;
 
     @Column(name = "image")
@@ -27,4 +28,7 @@ public class Meal implements Serializable {
 
     @Column(name = "url")
     private String url;
+/*
+    @ManyToMany(cascade = CascadeType.ALL,mappedBy = "userMeals",fetch = FetchType.EAGER)
+    private Set<User> meals;*/
 }

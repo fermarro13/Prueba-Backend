@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.Data;
 
 import java.util.List;
+import java.util.Set;
 
 @Entity
 @Data
@@ -25,11 +26,15 @@ public class User {
     private String mealStatus;
 
     @OneToMany
-    @JoinColumn(name="user_id")
+    @JoinColumn(name = "user_id")
     private List<Role> roles;
 
-    @OneToMany
-    @JoinColumn(name = "user_id")
-    private List<Meal> meals;
+
+    @ManyToMany
+    @JoinTable(name = "users_meals",
+            joinColumns = @JoinColumn(name = "user_id",
+                    referencedColumnName = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "meal_id", referencedColumnName = "meal_id"))
+    private Set<Meal> userMeals;
 
 }
