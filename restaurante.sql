@@ -8,5 +8,3 @@ insert into users(username,password) values('user1','$2a$10$4DT94dgszrJ6bJKjrruw
 insert into users(username,password) values('user2','$2a$10$en/1m7/bz0NFmE9aOafp7.QX5d2gdQ0JBDFX5ki/QX3TgjZW6eUGy');
 insert into roles(name,user_id) values('ROLE_ADMIN',1);
 insert into roles(name,user_id) values('ROLE_ADMIN',2);
-INSERT INTO `restaurant`.`meals` (`meal_id`, `name`, `category`, `origin`, `image`, `url`) VALUES ('0', 'tamal', 'tamal', 'tamal', 'tamal', 'tamal');
-INSERT INTO `restaurant`.`meals` (`meal_id`, `name`, `category`, `origin`, `image`, `url`) VALUES ('1', 'pache', 'pache', 'pache', 'pache', 'pache');
