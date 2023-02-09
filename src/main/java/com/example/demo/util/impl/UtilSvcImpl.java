@@ -10,12 +10,17 @@ import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
+import java.util.Collections;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @Service
@@ -24,6 +29,10 @@ public class UtilSvcImpl implements UtilSvc {
 
     private final int MAX_MEALS = 30;
     private final int MAX_ATTEMPTS = 5;
+
+    private final String STATUS_END = "END";
+
+    private final String STATUS_ERR = "ERR";
 
     @Autowired
     private UserDao userDao;
@@ -36,25 +45,35 @@ public class UtilSvcImpl implements UtilSvc {
 
     @Async
     @Override
-    public void fillMeals(User user){
-        int attempts = 1;
-        Set<Meal> meals = new HashSet<>();
-        ResponseEntity<String> response;
-        while (meals.size()<MAX_MEALS) {
-            response = restClient.get("https://www.themealdb.com/api/json/v1/1/random.php");
-            if(response.getStatusCode().equals(HttpStatusCode.valueOf(200))){
-                Meal meal = jsonToMeal(response.getBody());
-                mealDao.save(meal);
-                meals.add(meal);
-                user.setUserMeals(meals);
-                userDao.save(user);
-            }else{
-                log.error(response.getStatusCode().toString(),response.getBody());
-                if(attempts==MAX_ATTEMPTS){
-                    break;
+    public void fillMeals(User user) {
+        try {
+            int attempts = 1;
+            Set<Meal> meals = new HashSet<>();
+            ResponseEntity<String> response;
+            while (meals.size() < MAX_MEALS) {
+                response = restClient.get("https://www.themealdb.com/api/json/v1/1/random.php");
+                if (response.getStatusCode().equals(HttpStatusCode.valueOf(200))) {
+                    Meal meal = jsonToMeal(response.getBody());
+                    mealDao.save(meal);
+                    meals.add(meal);
+                    user.setUserMeals(meals);
+                    userDao.save(user);
+                } else {
+                    log.error(response.getStatusCode().toString(), response.getBody());
+                    user.setMealStatus(STATUS_ERR);
+                    userDao.save(user);
+                    if (attempts == MAX_ATTEMPTS) {
+                        break;
+                    }
+                    attempts++;
                 }
-                attempts++;
             }
+            user.setMealStatus(user.getMealStatus()==STATUS_ERR?STATUS_ERR:STATUS_END);
+            userDao.save(user);
+        } catch (Exception e) {
+            e.printStackTrace();
+            user.setMealStatus(STATUS_ERR);
+            userDao.save(user);
         }
     }
 
@@ -75,4 +94,17 @@ public class UtilSvcImpl implements UtilSvc {
     }
 
 
+    @Override
+    public List paginateList(List<Meal> list,int page,int size) {
+        if(size <= 0 || page <= 0) {
+            throw new IllegalArgumentException("invalid page size: " + size);
+        }
+
+        int fromIndex = (page - 1) * size;
+        if(list == null || list.size() <= fromIndex){
+            return Collections.emptyList();
+        }
+
+        return list.subList(fromIndex, Math.min(fromIndex + size, list.size()));
+    }
 }

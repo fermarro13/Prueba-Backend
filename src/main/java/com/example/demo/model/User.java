@@ -35,6 +35,7 @@ public class User {
             joinColumns = @JoinColumn(name = "user_id",
                     referencedColumnName = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "meal_id", referencedColumnName = "meal_id"))
+    @OrderBy("mealId")
     private Set<Meal> userMeals;
 
 }

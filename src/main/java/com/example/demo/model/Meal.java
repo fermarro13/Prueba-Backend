@@ -28,7 +28,5 @@ public class Meal implements Serializable {
 
     @Column(name = "url")
     private String url;
-/*
-    @ManyToMany(cascade = CascadeType.ALL,mappedBy = "userMeals",fetch = FetchType.EAGER)
-    private Set<User> meals;*/
+
 }
